@@ -6,6 +6,6 @@ type Config struct {
 	sources []SourceInfo
 }
 
-func LoadConfig() (*Config, error) {
+func LoadConfig(configPath string) (*Config, error) {
 	return new(Config), nil
 }
