@@ -12,7 +12,7 @@ var rootCmd = cobra.Command{
 	Use:   "litecd",
 	Short: "Tiny deployment infrastructure focused on personal projects.",
 	Long:  "",
-	Run:   runApp,
+	RunE:  runApp,
 }
 
 type AppConfig struct {
@@ -26,13 +26,15 @@ func init() {
 		"Configuration file (default: /etc/litecd.conf)")
 }
 
-func runApp(cmd *cobra.Command, args []string) {
+func runApp(cmd *cobra.Command, args []string) error {
 	config, err := config.LoadConfig(appConfig.configFilePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading configuration: %v\n", err)
+		return err
 	}
 
 	_ = config
+
+	return nil
 }
 
 func main() {
