@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"os"
-	"path/filepath"
+	"log"
 
 	"github.com/kofuk/litecd/config"
+	"github.com/kofuk/litecd/fetcher"
 	"github.com/spf13/cobra"
 )
 
@@ -20,14 +20,29 @@ var rootCmd = cobra.Command{
 }
 
 func runApp(cmd *cobra.Command, args []string) error {
-	dataRoot := os.Getenv("LITECD_DATA_ROOT")
+	fs := config.FilesystemNew()
 
-	config, err := config.LoadConfig(filepath.Join(dataRoot, configFile))
+	config, err := config.LoadConfig(fs)
 	if err != nil {
 		return err
 	}
 
-	_ = config
+	for _, source := range config.Sources {
+		fetcher, err := fetcher.GetFetcherForType(source.FetcherType)
+		if err != nil {
+			return err
+		}
+
+		if initialized, _ := fetcher.IsInitialized(&source, fs); !initialized {
+			if err := fetcher.Initialize(&source, fs); err != nil {
+				log.Println(err)
+			}
+		} else {
+			if err := fetcher.Update(&source, fs); err != nil {
+				log.Println(err)
+			}
+		}
+	}
 
 	return nil
 }
