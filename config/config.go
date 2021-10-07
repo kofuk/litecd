@@ -7,9 +7,21 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Credential struct {
+	CredentialType string `yaml:"type"`
+
+	// Fields for CredentialType="password"
+	UserName       string `yaml:"user"`
+	Password       string `yaml:"password"`
+}
+
 type SourceInfo struct {
-	FetcherType string `yaml:"type"`
-	GitRepo     string `yaml:"githubRepo"`
+	FetcherType string     `yaml:"type"`
+
+	// Fields for FetcherType="git"
+	GitRepo     string     `yaml:"gitRepo"`
+
+	Credential  Credential `yaml:"credential"`
 }
 
 type Config struct {

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"os"
 	"path/filepath"
 
 	"github.com/kofuk/litecd/config"
@@ -8,19 +9,8 @@ import (
 )
 
 const (
-	configFile = "etc/litecd.yml"
+	configFile = "/etc/litecd.yml"
 )
-
-type AppOption struct {
-	dataRoot string
-}
-
-var option AppOption
-
-func init() {
-	rootCmd.PersistentFlags().StringVar(&option.dataRoot, "data-root", "/",
-		"Data directory for litecd (default: /)")
-}
 
 var rootCmd = cobra.Command{
 	Use:   "litecd",
@@ -30,7 +20,9 @@ var rootCmd = cobra.Command{
 }
 
 func runApp(cmd *cobra.Command, args []string) error {
-	config, err := config.LoadConfig(filepath.Join(option.dataRoot, configFile))
+	dataRoot := os.Getenv("LITECD_DATA_ROOT")
+
+	config, err := config.LoadConfig(filepath.Join(dataRoot, configFile))
 	if err != nil {
 		return err
 	}
