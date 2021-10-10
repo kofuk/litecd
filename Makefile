@@ -8,6 +8,10 @@ all:
 run:
 	$(GO) run .
 
+.PHONY: test
+test:
+	$(GO) test ./...
+
 .PHONY: clean
 clean:
 	$(RM) litecd

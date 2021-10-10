@@ -11,7 +11,8 @@ type Filesystem struct {
 
 const (
 	configPath = "/etc/litecd.yml"
-	dataDir    = "/var/lib/litecd"
+	dataBaseDir    = "/var/lib/litecd"
+	secretsDir = "secrets"
 )
 
 func FilesystemNew() Filesystem {
@@ -20,14 +21,14 @@ func FilesystemNew() Filesystem {
 	}
 }
 
-func (h Filesystem) GetConfigPath() string {
-	return filepath.Join(h.dataRoot, configPath)
+func (fs Filesystem) GetConfigPath() string {
+	return filepath.Join(fs.dataRoot, configPath)
 }
 
-func (h Filesystem) PrepareDataDir() (string, error) {
-	path := filepath.Join(h.dataRoot, dataDir)
+func (fs Filesystem) PrepareDataDir() (string, error) {
+	path := filepath.Join(fs.dataRoot, dataBaseDir)
 	if _, err := os.Stat(path); err != nil && os.IsNotExist(err)  {
-		err := os.MkdirAll(path, 0700)
+		err := os.MkdirAll(path, 0755)
 		if err != nil {
 			return "", err
 		}
@@ -35,5 +36,21 @@ func (h Filesystem) PrepareDataDir() (string, error) {
 		return "", err
 	}
 
+	return path, nil
+}
+
+func (fs Filesystem) PrepareSecretsDir() (string, error) {
+	if _, err := fs.PrepareDataDir(); err != nil {
+		return "", err
+	}
+
+	path := filepath.Join(fs.dataRoot, dataBaseDir, secretsDir)
+	if _, err := os.Stat(path); err != nil && os.IsNotExist(err) {
+		if err := os.Mkdir(path, 0700); err != nil {
+			return "", err
+		}
+	} else if err != nil {
+		return "", err
+	}
 	return path, nil
 }
