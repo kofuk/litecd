@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	secretsFilename = "secrest.json"
+	secretsFilename = "secrets.json"
 )
 
 type Secrets map[string]string

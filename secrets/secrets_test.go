@@ -5,56 +5,61 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/kofuk/litecd/config"
 )
 
-func setUpWithFile(name, testJson string) (string, error) {
-	dataRoot := filepath.Join("/tmp/litecd_test.d", name)
-	secretsPath := filepath.Join(dataRoot, "var/lib/litecd/secrets")
+type fakeFilesystem struct {
+	rootDir string
+}
 
-	err := os.MkdirAll(secretsPath, 0755)
-	if err != nil && !os.IsExist(err) {
-		return "", err
+func newFakeFilesystem(name string) fakeFilesystem {
+	rootDir := filepath.Join("/tmp/litecd_test.d", name)
+	if err := os.MkdirAll(rootDir, 0755); err != nil {
+		panic(err)
 	}
 
-	infile, err := os.Open(testJson)
+	// Prepare secret file
+	infile, err := os.Open(filepath.Join("testdata/", name+".json"))
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	defer infile.Close()
 
-	outfile, err := os.Create(filepath.Join(secretsPath, secretsFilename))
+	outfile, err := os.Create(filepath.Join(rootDir, "secrets.json"))
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 	defer outfile.Close()
 
-	_, err = io.Copy(outfile, infile)
-	if err != nil {
-		return "", err
+	if _, err = io.Copy(outfile, infile); err != nil {
+		panic(err)
 	}
 
-	return dataRoot, nil
+	return fakeFilesystem{
+		rootDir: rootDir,
+	}
 }
 
-func tearDown(name string) error {
-	dataRoot := filepath.Join("/tmp/litecd_test.d", name)
-	if err := os.RemoveAll(dataRoot); !os.IsNotExist(err) {
-		return err
+func (fs fakeFilesystem) GetConfigPath() string {
+	return filepath.Join(fs.rootDir, "config.yml")
+}
+
+func (fs fakeFilesystem) PrepareDataDir() (string, error) {
+	return fs.rootDir, nil
+}
+
+func (fs fakeFilesystem) PrepareSecretsDir() (string, error) {
+	return fs.rootDir, nil
+}
+
+func (fs fakeFilesystem) tearDown() {
+	if err := os.RemoveAll(fs.rootDir); err != nil {
+		panic(err)
 	}
-	return nil
 }
 
 func TestGetAllSecrets(t *testing.T) {
-	path, err := setUpWithFile("read", "testdata/test_secrets.json")
-	if err != nil {
-		t.Fatal("Setup failure: ", err)
-	}
-	defer tearDown("read")
-
-	os.Setenv("LITECD_DATA_ROOT", path)
-	fs := config.FilesystemNew()
+	fs := newFakeFilesystem("test_secrets")
+	defer fs.tearDown()
 
 	secrets, err := GetAllSecrets(fs)
 	if err != nil {
@@ -67,16 +72,10 @@ func TestGetAllSecrets(t *testing.T) {
 }
 
 func TestStoreSecret(t *testing.T) {
-	path, err := setUpWithFile("write", "testdata/test_secrets.json")
-	if err != nil {
-		t.Fatal("Setup failure: ", err)
-	}
-	defer tearDown("write")
+	fs := newFakeFilesystem("test_secrets")
+	defer fs.tearDown()
 
-	os.Setenv("LITECD_DATA_ROOT", path)
-	fs := config.FilesystemNew()
-
-	err = StoreSecret(fs, "hoge", "fuga")
+	err := StoreSecret(fs, "hoge", "fuga")
 	if err != nil {
 		t.Fatal(err)
 	}
