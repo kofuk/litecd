@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/kofuk/litecd/config"
+	"github.com/kofuk/litecd/filesystem"
 )
 
 type Fetcher interface {
-	IsInitialized(*config.SourceInfo, config.Filesystem) (bool, error)
-	Initialize(*config.SourceInfo, config.Filesystem) error
-	Update(*config.SourceInfo, config.Filesystem) error
+	IsInitialized(*config.SourceInfo, filesystem.Filesystem) (bool, error)
+	Initialize(*config.SourceInfo, filesystem.Filesystem) error
+	Update(*config.SourceInfo, filesystem.Filesystem) error
 }
 
 var (

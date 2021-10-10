@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/kofuk/litecd/filesystem"
 	"gopkg.in/yaml.v2"
 )
 
@@ -11,8 +12,8 @@ type Credential struct {
 	CredentialType string `yaml:"type"`
 
 	// Fields for CredentialType="password"
-	UserName string `yaml:"user"`
-	Password string `yaml:"password"`
+	UserName ExpandableString `yaml:"user"`
+	Password ExpandableString `yaml:"password"`
 }
 
 type SourceInfo struct {
@@ -29,7 +30,7 @@ type Config struct {
 	Sources []SourceInfo `yaml:"sources"`
 }
 
-func LoadConfig(fs Filesystem) (*Config, error) {
+func LoadConfig(fs filesystem.Filesystem) (*Config, error) {
 	file, err := os.Open(fs.GetConfigPath())
 	if err != nil {
 		return nil, err

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/kofuk/litecd/config"
+	"github.com/kofuk/litecd/filesystem"
 	"github.com/kofuk/litecd/fetcher"
 	"github.com/spf13/cobra"
 )
@@ -20,7 +21,7 @@ var rootCmd = cobra.Command{
 }
 
 func runApp(cmd *cobra.Command, args []string) error {
-	fs := config.FilesystemNew()
+	fs := filesystem.FilesystemNew()
 
 	config, err := config.LoadConfig(fs)
 	if err != nil {

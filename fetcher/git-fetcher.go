@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/kofuk/litecd/config"
+	"github.com/kofuk/litecd/filesystem"
 )
 
 type GitFetcher struct{}
@@ -37,7 +38,7 @@ func getDataPath(dataDir string, source *config.SourceInfo) string {
 	return filepath.Join(dataDir, "git", createDataDirName(source))
 }
 
-func (*GitFetcher) IsInitialized(source *config.SourceInfo, fs config.Filesystem) (bool, error) {
+func (*GitFetcher) IsInitialized(source *config.SourceInfo, fs filesystem.Filesystem) (bool, error) {
 	path, err := fs.PrepareDataDir()
 	if err != nil {
 		return false, err
@@ -54,7 +55,7 @@ func (*GitFetcher) IsInitialized(source *config.SourceInfo, fs config.Filesystem
 	return true, nil
 }
 
-func (*GitFetcher) Initialize(source *config.SourceInfo, fs config.Filesystem) error {
+func (*GitFetcher) Initialize(source *config.SourceInfo, fs filesystem.Filesystem) error {
 	path, err := fs.PrepareDataDir()
 	if err != nil {
 		return err
@@ -87,7 +88,7 @@ func (*GitFetcher) Initialize(source *config.SourceInfo, fs config.Filesystem) e
 	return nil
 }
 
-func (*GitFetcher) Update(source *config.SourceInfo, fs config.Filesystem) error {
+func (*GitFetcher) Update(source *config.SourceInfo, fs filesystem.Filesystem) error {
 	dataDir, err := fs.PrepareDataDir()
 	if err != nil {
 		return err

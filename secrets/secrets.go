@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/kofuk/litecd/config"
+	"github.com/kofuk/litecd/filesystem"
 )
 
 const (
@@ -16,7 +16,7 @@ const (
 
 type Secrets map[string]string
 
-func GetAllSecrets(fs config.Filesystem) (Secrets, error) {
+func GetAllSecrets(fs filesystem.Filesystem) (Secrets, error) {
 	secretsDir, err := fs.PrepareSecretsDir()
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func GetAllSecrets(fs config.Filesystem) (Secrets, error) {
 	return result, nil
 }
 
-func StoreSecret(fs config.Filesystem, key, value string) error {
+func StoreSecret(fs filesystem.Filesystem, key, value string) error {
 	secretsData, err := GetAllSecrets(fs)
 	if err != nil {
 		return err
