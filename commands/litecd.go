@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/kofuk/litecd/config"
-	"github.com/kofuk/litecd/filesystem"
 	"github.com/kofuk/litecd/fetcher"
+	"github.com/kofuk/litecd/filesystem"
 	"github.com/spf13/cobra"
 )
 
